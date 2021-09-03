@@ -202,24 +202,11 @@ namespace WebViewControl {
                     //LogMessage($"Evaluating '{script}' on ('{Id}')");
 #endif
                     try {
-                        //LogMessage($"WebView.JavascriptExecutor#EvaluateScript\n'{script}'");
-                        //var innerEvaluationTask = OwnerWebView.chromium.EvaluateJavaScript<T>(WrapScriptWithErrorHandling(scriptToEvaluate), timeout: timeout);
-                        //innerEvaluationTask.Wait(FlushTaskCancelationToken.Token);
-                        //LogMessage($"WebView.JavascriptExecutor#EvaluateScript'{script}'#Ended");
-                        //evaluationTask.SetResult(GetResult<T>(innerEvaluationTask.Result));
-
                         LogMessage($"WebView.JavascriptExecutor#EvaluateScript\n'{script}'");
-                        var innerEvaluationTask = OwnerWebView.chromium.EvaluateJavaScript<T>(WrapScriptWithErrorHandling(scriptToEvaluate), timeout: timeout, forceExecute: true);
-                        var x = innerEvaluationTask.ContinueWith((t => {
-
-                            evaluationTask.SetResult(GetResult<T>(t.Result));
-                            LogMessage($"WebView.JavascriptExecutor#EvaluateScript#Evaluate#ResultSet");
-
-                        }), TaskContinuationOptions.ExecuteSynchronously); //FlushTaskCancelationToken.Token,
-
-                        x.Wait(FlushTaskCancelationToken.Token);
+                        var innerEvaluationTask = OwnerWebView.chromium.EvaluateJavaScript<T>(WrapScriptWithErrorHandling(scriptToEvaluate), timeout: timeout);
+                        innerEvaluationTask.Wait(FlushTaskCancelationToken.Token);
                         LogMessage($"WebView.JavascriptExecutor#EvaluateScript'{script}'#Ended");
-                        
+                        evaluationTask.SetResult(GetResult<T>(innerEvaluationTask.Result));
                     } catch (Exception e) {
                         if (FlushTaskCancelationToken.IsCancellationRequested) {
                             evaluationTask.SetResult(GetResult<T>(default(T)));
@@ -253,9 +240,8 @@ namespace WebViewControl {
                     }
                 }
 
-                var xxxx =  await evaluationTask.Task;
                 LogMessage($"WebView.JavascriptExecutor#EvaluateScript#Ended\n'{script}'");
-                return xxxx;
+                return await evaluationTask.Task;
             }
 
             public Task<T> EvaluateScriptFunction<T>(string functionName, bool serializeParams, params object[] args) {
@@ -306,13 +292,7 @@ namespace WebViewControl {
             }
 
             private static string WrapScriptWithErrorHandling(string script, int nrOfScripts = 0) {
-                return "try {" + script + Environment.NewLine + "} catch (e) { console.log(e); throw JSON.stringify({ stack: e.stack, message: e.message, name: e.name }) + '" + InternalException + "' }";
-                //return "try {" +
-                //    "let startTime = Date.now();" +
-                //    "console.log('scriptCall{" + nrOfScripts + "}-started', (new Date()).toISOString());" +
-                //        script + Environment.NewLine +
-                //        "console.log('scriptCall{" + nrOfScripts + "}-ended', Date.now() - startTime);" +
-                //    "} catch (e) { console.log(e); throw JSON.stringify({ stack: e.stack, message: e.message, name: e.name }) + '" + InternalException + "' }" ;
+                return "try {" + script + Environment.NewLine + "} catch (e) { throw JSON.stringify({ stack: e.stack, message: e.message, name: e.name }) + '" + InternalException + "' }";
             }
 
             private static T DeserializeJSON<T>(string json) {
