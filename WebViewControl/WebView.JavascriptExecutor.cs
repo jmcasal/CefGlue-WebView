@@ -209,7 +209,7 @@ namespace WebViewControl {
                         //evaluationTask.SetResult(GetResult<T>(innerEvaluationTask.Result));
 
                         LogMessage($"WebView.JavascriptExecutor#EvaluateScript\n'{script}'");
-                        var innerEvaluationTask = OwnerWebView.chromium.EvaluateJavaScript<T>(WrapScriptWithErrorHandling(scriptToEvaluate), timeout: timeout);
+                        var innerEvaluationTask = OwnerWebView.chromium.EvaluateJavaScript<T>(WrapScriptWithErrorHandling(scriptToEvaluate), timeout: timeout, forceExecute: true);
                         var x = innerEvaluationTask.ContinueWith((t => {
 
                             evaluationTask.SetResult(GetResult<T>(t.Result));
