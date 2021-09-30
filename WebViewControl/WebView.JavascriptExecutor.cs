@@ -165,11 +165,11 @@ namespace WebViewControl {
             }
 
             private void LogMessage(string message) {
-               Debug.WriteLine($"Thread[{Thread.CurrentThread.ManagedThreadId}]-{DateTime.Now.ToString("mm':'ss.ffff")}####{message}");
+               //Debug.WriteLine($"Thread[{Thread.CurrentThread.ManagedThreadId}]-{DateTime.Now.ToString("mm':'ss.ffff")}####{message}");
             }
 
             private void LogMessageLine(string message) {
-                Debug.WriteLine($"\n\n\n\nThread[{Thread.CurrentThread.ManagedThreadId}]-{DateTime.Now.ToString("mm':'ss.ffff")}####{message}");
+                //Debug.WriteLine($"\n\n\n\nThread[{Thread.CurrentThread.ManagedThreadId}]-{DateTime.Now.ToString("mm':'ss.ffff")}####{message}");
             }
 
             private void BulkExecuteScripts(IEnumerable<ScriptTask> scriptsToExecute) {
